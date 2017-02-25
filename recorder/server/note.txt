@@ -1,0 +1,45 @@
+
+1.prepare the env
+
+OS: UBUNTU 64 14.04
+1.1 install required package
+#sudo apt-get install zlib1g-dev
+#sudo apt-get install libssl-dev
+#sudo apt-get install gyp
+#sudo apt-get install cmake
+
+1.2 prepare ninja build env:
+
+#tar zxf depot_tools.tar.gz ./
+
+add depot_tools tools into linux env.
+#export PATH=${PATH}:(current directory/depot_tools)
+
+add this line to ~/.bashrc and source ~/.bashrc.
+next time after linux start, depot_tools will be added to system env automatically.
+
+1.3 prepare and install libwebsocket
+
+#tar zxf libwebsockets.tar.gz
+#cd libwebsockets
+#mkdir build
+#cd build
+#cmake ..
+#make install
+
+1.4 build recorder server
+#tar zxf server_recorder.tar.gz
+#cd server_recorder
+
+build:
+#genProj.sh
+
+clean:
+#doClean.sh
+
+run:
+#build/out/Default/recorder 8888
+8888 is the port number used.
+
+
+
