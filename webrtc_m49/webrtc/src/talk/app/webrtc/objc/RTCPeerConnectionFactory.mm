@@ -139,6 +139,15 @@ bool webrtc::AudioDeviceModule::useNewAudioDevice = true;
 + (void)setUdpEncrypt2:(BOOL)flag {
     rtc::PhysicalSocket::udpEncrypt2_ = flag;
 }
+
++ (void)startCall{
+    //rtc::PhysicalSocket::startCall();
+}
+
++ (void)addUdpCRCKey:(NSString*)key forAddress:(NSString*)addr andPort:(int)port{
+    //rtc::PhysicalSocket::addUdpCRCKey([key UTF8String], [addr UTF8String], port);
+}
+
 // end
 
 + (void)initializeSSL {

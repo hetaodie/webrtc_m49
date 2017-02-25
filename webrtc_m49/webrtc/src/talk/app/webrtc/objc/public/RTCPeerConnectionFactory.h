@@ -59,6 +59,9 @@
 + (void)setUdpEncrypt2:(BOOL)flag;
 + (NSString*)getRoutePath;
 + (void)clearRoute;
++ (void)startCall; 
++ (void)addUdpCRCKey:(NSString*)key forAddress:(NSString*)addr andPort:(int)port;
+
 // end
 
 // Initialize & de-initialize the SSL subsystem.  Failure is fatal.

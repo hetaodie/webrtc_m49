@@ -48,6 +48,7 @@
 #include "webrtc/base/timeutils.h"
 #include "webrtc/base/winping.h"
 #include "webrtc/base/win32socketinit.h"
+#include "webrtc/base/crc32.h"
 
 #include "third_party/boringssl/src/include/openssl/aes.h" //jay add
 
@@ -199,7 +200,16 @@ static const int ICMP_PING_TIMEOUT_MILLIS = 10000u;
         udpAesKey_=aesKey;
     }
 
-    bool PhysicalSocket::udpEncrypt2_ = false;    
+    bool PhysicalSocket::udpEncrypt2_ = false;
+    
+    std::map<std::string, std::string> PhysicalSocket::addrKey1Map_;
+    void PhysicalSocket::addUdpCRCKey(std::string key, std::string addr, int port) {
+        addrKey1Map_.insert(std::pair<std::string, std::string>(addr + ":"+ std::to_string(port), key));
+    }
+    
+    void PhysicalSocket::startCall() {
+        addrKey1Map_.clear();
+    }
     
 PhysicalSocket::PhysicalSocket(PhysicalSocketServer* ss, SOCKET s)
   : ss_(ss), s_(s), enabled_events_(0), error_(0),
@@ -412,7 +422,15 @@ int PhysicalSocket::SendTo(const void* buffer,
         uint32_t nTmpSize = htonl(length);
         tmpRawData.append((const char*)&nTmpSize,4);
         tmpRawData.append((char*)buffer,length);
-        encryptRtpData=PhysicalSocket_EncodeAES(udpAesKey_, tmpRawData,true,"0102030405060708");
+        //encryptRtpData=PhysicalSocket_EncodeAES(udpAesKey_, tmpRawData,true,"0102030405060708");
+        
+        
+        std::string tmpEncrypt = PhysicalSocket_EncodeAES(udpAesKey_, tmpRawData,true,"0102030405060708");
+        uint32_t aCrc32 = ComputeCrc32(tmpEncrypt + std::to_string(2)/*addrKey1Map_[addr.ToString()]*/);
+        uint32_t key2 = 1; // renjian add
+        encryptRtpData = std::to_string(aCrc32 xor key2) + tmpEncrypt + std::to_string(aCrc32);
+
+        
         int appendSize=rand()%6+1;
         for(int kkk=0;kkk<appendSize;kkk++){
             uint8_t ccc=rand()%254;
@@ -503,11 +521,11 @@ int PhysicalSocket::RecvFrom(void* buffer,
     } else if (udpAesKey_.empty()==false){
 //        LOG(LS_INFO) << "++++++PhysicalSocket::RecvFrom+++++";
         if(size>=16){
-            int dataLen=size;
+            int dataLen=size-4;
             if(size %16){
                 dataLen -=size%16;
             }
-            std::string tmpData((char*)buffer,dataLen);
+            std::string tmpData((char*)buffer+4,dataLen);
             std::string decyptData=PhysicalSocket_DecodeAES(udpAesKey_, tmpData ,true,"0102030405060708");
             uint32_t nsize=0;
             memcpy((char*)&nsize,decyptData.data()+4,4);

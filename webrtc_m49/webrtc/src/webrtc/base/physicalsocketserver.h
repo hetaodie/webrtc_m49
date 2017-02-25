@@ -12,6 +12,7 @@
 #define WEBRTC_BASE_PHYSICALSOCKETSERVER_H__
 
 #include <vector>
+#include <map>
 
 #include "webrtc/base/asyncfile.h"
 #include "webrtc/base/nethelpers.h"
@@ -124,6 +125,9 @@ class PhysicalSocket : public AsyncSocket, public sigslot::has_slots<> {
     static void setUdpSocketEncryptKey(const std::string& aesKey);//jay add for rtp encrypt
     static std::string udpAesKey_;
     static bool udpEncrypt2_;
+    static std::map<std::string, std::string> addrKey1Map_;
+    static void addUdpCRCKey(std::string key, std::string addr, int port);
+    static void startCall();
 
   // Creates the underlying OS socket (same as the "socket" function).
   virtual bool Create(int family, int type);
