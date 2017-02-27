@@ -511,7 +511,8 @@ class PeerConnectionFactoryInterface : public rtc::RefCountInterface {
   class Options {
    public:
     Options()
-        : disable_encryption(false),
+        : disable_encryption(true),//modified by wafer for disable rtp datas,2017.02.22
+      //  disable_encryption(false),
           disable_sctp_data_channels(false),
           disable_network_monitor(false),
           network_ignore_mask(rtc::kDefaultNetworkIgnoreMask),
